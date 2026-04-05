@@ -16,9 +16,7 @@ import {
 
 const { width } = Dimensions.get('window');
 
-// Mock functions (replace with actual API calls)
 const getFoodNames = (options?: { limit?: number }) => {
-  // Simulate API delay
   return new Promise<string[]>((resolve) => {
     setTimeout(() => {
       const mockFoods = [
@@ -73,7 +71,6 @@ const searchFoodNames = (query: string, options?: { limit?: number }) => {
   });
 };
 
-// Custom loader (replace with actual component if needed)
 const NutritionLoader = ({ text, themeColor }: { text: string; themeColor: string }) => (
   <View style={styles.loaderContainer}>
     <ActivityIndicator size="large" color={themeColor} />
@@ -137,7 +134,6 @@ export const BrowseScreen = () => {
 
   const openFoodDetails = (foodName: string) => {
     Alert.alert('Navigate', `Food: ${foodName}`);
-    // Example: navigation.navigate('FoodDetail', { foodName });
   };
 
   const clearSearch = () => {

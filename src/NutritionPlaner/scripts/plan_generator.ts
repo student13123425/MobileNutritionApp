@@ -1,4 +1,3 @@
-// planGenerator.ts
 export interface DietPlanConfig {
   name: string;
   description: string;

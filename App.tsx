@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -15,14 +15,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { checkStartedFlag } from './src/CommunScripts/config';
 import HomeScreen from './src/Homescreen';
 
-// --- Types ---
 type FeatureCardProps = {
   icon: string;
   title: string;
   description: string;
 };
 
-// --- App Components ---
 const HomePage = () => {
   const [started, setStarted] = useState(false);
 
@@ -98,7 +96,6 @@ const HomePage = () => {
 
 
 
-// --- Feature Card Component ---
 const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
   return (
     <View style={styles.featureCard}>
@@ -111,10 +108,8 @@ const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
   );
 };
 
-// --- Navigation Ref (Global) ---
 let navigationRef: React.RefObject<any> | null = null;
 
-// --- Main App Component ---
 const App = () => {
   const [started, setStarted] = useState(false);
 
@@ -232,7 +227,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// --- Stack Navigator Setup ---
 const Stack = createNativeStackNavigator();
 
 export default App;

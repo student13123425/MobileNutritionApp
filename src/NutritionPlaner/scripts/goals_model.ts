@@ -1,4 +1,3 @@
-// goalsModel.ts
 export interface NutritionalGoals {
   targetCalories: number;
   targetProteinGrams: number;

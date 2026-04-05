@@ -1,9 +1,6 @@
-/**
- * Enums
- */
 export enum ScheduleType {
   SINGLE_EVENT = 'SINGLE_EVENT',
-  REC_WEEKLY = 'REC_WEEKLY', // Shortened for TS convention
+  REC_WEEKLY = 'REC_WEEKLY',
   DAILY = 'DAILY'
 }
 
@@ -14,15 +11,12 @@ export enum MealType {
   snack = 'snack'
 }
 
-/**
- * TimeItem Class
- */
 export class TimeItem {
   type: ScheduleType;
   title: string;
   startHour: number;
   endHour: number;
-  recurringDays?: number[]; // Array of numbers 0-6 (Sunday-Saturday)
+  recurringDays?: number[];
   startDate?: Date;
   endDate?: Date;
 
@@ -42,7 +36,6 @@ export class TimeItem {
     }
 
     if (this.type === ScheduleType.REC_WEEKLY && this.recurringDays) {
-      // JS getDay() returns 0 for Sunday, 1 for Monday... 6 for Saturday
       const dayIndex = date.getDay();
       if (!this.recurringDays.includes(dayIndex)) return false;
     }
@@ -52,13 +45,10 @@ export class TimeItem {
   }
 }
 
-/**
- * FoodItem Class
- */
 export class FoodItem {
   name: string;
   category: string;
-  nutrients: Array<Record<string, any>>; // Kept typo 'nutrients' for compatibility
+  nutrients: Array<Record<string, any>>;
   portions: Array<Record<string, any>>;
   attributes: Array<Record<string, any>>;
   brandedInfo: Record<string, any>;
@@ -95,14 +85,11 @@ export class FoodItem {
   }
 }
 
-/**
- * Recipe Class
- */
 export class Recipe {
   name: string;
   minutes: number;
   steps: string;
-  description: string; // Kept typo 'description' for compatibility
+  description: string;
   nutrition?: string;
   tags: string[];
   ingredients: string[];
@@ -142,9 +129,6 @@ export class Recipe {
   }
 }
 
-/**
- * DailyGoals Class
- */
 export class DailyGoals {
   id: number;
   targetCalories: number;
@@ -185,9 +169,6 @@ export class DailyGoals {
   }
 }
 
-/**
- * FoodLogEntry Class
- */
 export class FoodLogEntry {
   id?: number;
   foodName: string;
@@ -208,10 +189,9 @@ export class FoodLogEntry {
   }
 
   static fromJson(json: any): FoodLogEntry {
-    // Reconstruct TimeItem from flat JSON structure used in the original code
     const timeFrame = new TimeItem({
       title: json.timeFrameTitle || 'Unknown',
-      type: json.timeFrameType === ScheduleType.SINGLE_EVENT ? ScheduleType.SINGLE_EVENT : 
+      type: json.timeFrameType === ScheduleType.SINGLE_EVENT ? ScheduleType.SINGLE_EVENT :
             json.timeFrameType === ScheduleType.REC_WEEKLY ? ScheduleType.REC_WEEKLY : ScheduleType.DAILY,
       startHour: json.timeFrameStartHour || 0,
       endHour: json.timeFrameEndHour || 24,
@@ -231,7 +211,7 @@ export class FoodLogEntry {
   toJson(): any {
     return {
       id: this.id,
-      foodName: this.foodName, // Error in original logic? Assuming foodName
+      foodName: this.foodName,
       recipeId: this.recipeId,
       notes: this.notes,
       createdAt: this.createdAt.toISOString(),
@@ -244,9 +224,6 @@ export class FoodLogEntry {
   }
 }
 
-/**
- * PlannedMeal Class
- */
 export class PlannedMeal {
   type: MealType;
   items: FoodItem[];
@@ -290,9 +267,6 @@ export class PlannedMeal {
   }
 }
 
-/**
- * DailyPlan Class
- */
 export class DailyPlan {
   date: Date;
   meals: PlannedMeal[];
@@ -321,9 +295,6 @@ export class DailyPlan {
   }
 }
 
-/**
- * DietPlan Class
- */
 export class DietPlan {
   id: number;
   name: string;

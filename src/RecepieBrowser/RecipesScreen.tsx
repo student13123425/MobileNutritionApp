@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,6 @@ export const RecipesScreen: React.FC = () => {
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      // Use the recipeDb instance to get recipes
       const fetchedRecipes = await recipeDb.getRecipes(query);
       if (fetchedRecipes) {
         setRecipes(fetchedRecipes);
@@ -50,10 +49,12 @@ export const RecipesScreen: React.FC = () => {
     }, 300);
   };
 
+  const noop = () => {};
+
   const renderRecipeItem = ({ item }: { item: Recipe }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => {/* Navigation logic here */}}
+      onPress={() => noop()}
     >
       <Text style={styles.cardTitle}>{item.name}</Text>
       <Text style={styles.cardSubtitle}>Minutes: {item.minutes}</Text>
@@ -62,7 +63,6 @@ export const RecipesScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Search Bar Area */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBarWrapper}>
           <TextInput
@@ -83,7 +83,6 @@ export const RecipesScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Content Area */}
       <View style={styles.content}>
         {isLoading ? (
           <ActivityIndicator size="large" color="#2e7d32" />

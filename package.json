@@ -32,7 +32,6 @@
   "private": true,
   "devDependencies": {
     "@types/react": "^19.2.14",
-    "@types/react-native": "^0.72.8",
     "@types/react-native-vector-icons": "^6.4.18",
     "typescript": "^6.0.2"
   }

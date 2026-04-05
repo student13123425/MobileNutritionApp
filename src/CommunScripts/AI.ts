@@ -4,10 +4,9 @@ import { getGroqApiKey } from './config';
 
 const GROQ_BASE_URL = 'https://api.groq.com/openai/v1';
 
-// Create an Axios instance to mimic Dio's BaseOptions
 const groqApi = axios.create({
   baseURL: GROQ_BASE_URL,
-  timeout: 5000, // 5 seconds
+  timeout: 5000,
 });
 
 export const validateApiKey = async (apiKey: string): Promise<boolean> => {
@@ -20,7 +19,6 @@ export const validateApiKey = async (apiKey: string): Promise<boolean> => {
 
     return response.status === 200;
   } catch (error) {
-    // Check if it's an Axios error and specifically a 401 Unauthorized
     if (axios.isAxiosError(error)) {
       const err = error as AxiosError;
       if (err.response?.status === 401) {
@@ -38,11 +36,10 @@ export const generateDescription = async (foodName: string): Promise<string> => 
       throw new Error('API key not found in AsyncStorage');
     }
 
-    // Note: Fixed 'completions' typo to 'completions'
     const response = await groqApi.post(
       '/chat/completions',
       {
-        model: 'llama-3.1-8im-instant', // Ensure this model name is correct for Groq
+        model: 'llama-3.1-8im-instant',
         messages: [
           {
             role: 'system',
@@ -64,7 +61,6 @@ export const generateDescription = async (foodName: string): Promise<string> => 
       },
     );
 
-    // Extract content from the response path
     const content = response.data?.choices?.[0]?.message?.content;
     return content ? content.trim() : "Error: Empty response from AI.";
   } catch (error) {

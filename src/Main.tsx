@@ -1,36 +1,36 @@
-// App.tsx
-
-import React from 'react';
+import { useEffect, useState, createRef } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { copyJsonAssetIfNotExists, copyTextAssetIfNotExists, DatabaseService,} from './CommunScripts/database';
+import { copyJsonAssetIfNotExists,DatabaseService } from './CommunScripts/database';
 import Introduction from './introduction';
 import { checkStartedFlag } from './CommunScripts/config';
-import HomeScreen from './Homescreen';
 
 const Stack = createNativeStackNavigator();
+const navigationRef = createRef<any>();
 const dbService = new DatabaseService();
 
-// Main App component - keeping the same structure
+const navigateToHome = () => {
+  navigationRef.current?.navigate('Introduction', undefined, { merge: false });
+};
+
 const App = () => {
-  React.useEffect(() => {
-    // Preload databases and initialize AI when app starts
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
     preloadDatabases();
     initAI();
   }, []);
 
-  const [hasStarted, setHasStarted] = React.useState(false);
-
-  React.useEffect(() => {
+  useEffect(() => {
     checkStartedFlag().then(value => setHasStarted(value));
   }, []);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator id='main' initialRouteName={hasStarted ? "Home" : "Introduction"}>
         <Stack.Screen
           name="Introduction"
@@ -47,7 +47,6 @@ const App = () => {
   );
 };
 
-// FeatureCard component - React Native version (same as before)
 interface FeatureCardProps {
   icon: string;
   title: string;
@@ -59,15 +58,18 @@ const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
     <View style={styles.card}>
       <Icon name={icon} size={32} color="#388E3C" />
       <View style={styles.cardContent}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.cardTitle}>{title}</Text>
         <Text style={styles.description} numberOfLines={2}>{description}</Text>
       </View>
     </View>
   );
 };
 
-// HomePage component - React Native version (same as before)
-const HomePage = ({ navigation }: { navigation: any }) => {
+const HomePage = () => {
+  const handlePress = () => {
+    navigateToHome();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -106,7 +108,7 @@ const HomePage = ({ navigation }: { navigation: any }) => {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('Introduction')}
+          onPress={handlePress}
         >
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
@@ -119,7 +121,15 @@ const HomePage = ({ navigation }: { navigation: any }) => {
   );
 };
 
-// Styles for the components (same as before)
+const HomeScreen = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Home Screen Placeholder</Text>
+      <Text style={styles.subtitle}>Main app screen coming soon...</Text>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -179,9 +189,15 @@ const styles = StyleSheet.create({
   cardContent: {
     flex: 1,
   },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginRight: 10,
+  },
   description: {
     fontSize: 14,
-    color: '#1B5E20',
+    color: '#555',
   },
   spacer: {
     height: 16,
@@ -215,37 +231,29 @@ const styles = StyleSheet.create({
   },
 });
 
-// Database preloading function that uses the imported database service
 async function preloadDatabases() {
   try {
     console.log("Starting database preloading...");
-
-    // Use the database service methods directly
     await dbService.copyDatabaseIfNotExists('assets/food.db', 'food.db');
     await dbService.copyDatabaseIfNotExists('assets/recipes.db', 'recipes.db');
-
-    // For JSON and text files, we'll need to implement similar functions in the database service
     await copyJsonAssetIfNotExists('assets/food_vocab.json', 'food_vocab.json');
-    await copyTextAssetIfNotExists("assets/food_names.json", "food_names.txt");
-    await copyTextAssetIfNotExists("assets/recipes_names.txt", "recipes_names.txt");
-
+    await copyJsonAssetIfNotExists("assets/food_names.json", "food_names.txt");
+    await copyJsonAssetIfNotExists("assets/recipes_names.txt", "recipes_names.txt");
     console.log("Preloading complete.");
   } catch (e) {
     console.error("Error during preloading:", e);
   }
 }
 
-// AI initialization function
 async function initAI() {
   try {
     const assetPath = 'assets/Qwen3.5-0.8B-Q4_K_M.gguf';
     const fileName = 'Qwen3.5-0.8B-Q4_K_M.gguf';
-
-    // Use the database service to copy the AI model if needed
     await dbService.copyDatabaseIfNotExists(assetPath, fileName);
-
     console.log("AI initialized successfully");
   } catch (e) {
     console.error("Error initializing AI:", e);
   }
 }
+
+export default App;

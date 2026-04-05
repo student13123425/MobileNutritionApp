@@ -108,10 +108,6 @@ export class Recipe {
     }
 }
 
-// =============================================================
-// 2. TOKENIZER (The Byte Decoding Engine)
-// =============================================================
-
 class Tokenizer {
     private static instance: Tokenizer;
     private forwardVocab: Map<string, number> = new Map();
@@ -138,7 +134,6 @@ class Tokenizer {
         } catch (e) {}
 
         try {
-            // This assumes the file was copied to DocDir during app launch
             const jsonString = await RNFS.readFile(localPath, 'utf8');
             this._loadVocabFromJson(jsonString);
             this.isLoaded = true;
@@ -163,7 +158,7 @@ class Tokenizer {
         const targetId = id !== undefined ? id : (this.forwardVocab.size + 1);
         const buffer = new ArrayBuffer(4);
         const view = new DataView(buffer);
-        view.setUint32(0, targetId, true); // Little Endian
+        view.setUint32(0, targetId, true);
         return new Uint8Array(buffer);
     }
 
@@ -172,7 +167,7 @@ class Tokenizer {
         const words: string[] = [];
         for (let i = 0; i <= blob.length - 4; i += 4) {
             const view = new DataView(blob.buffer, blob.byteOffset + i, 4);
-            const id = view.getUint32(0, true); // Little Endian
+            const id = view.getUint32(0, true);
             const word = this.reverseVocab.get(id);
             if (word && !['<PAD>', '<UNK>', '<EOS>'].includes(word)) {
                 words.push(word);
@@ -181,10 +176,6 @@ class Tokenizer {
         return words.join(" | ");
     }
 }
-
-// =============================================================
-// 3. DATABASE SERVICE
-// =============================================================
 
 export class DatabaseService {
     private tokenizer = Tokenizer.getInstance();
@@ -279,24 +270,23 @@ export class DatabaseService {
                 db.transaction((tx) => {
                     tx.executeSql(
                         `SELECT fi.name, fi.category, bf.brand_name, bf.ingredients,
-                             bf.serving_size, bf.serving_size_unit, bf.household_serving_fulltext,
-                             bf.branded_food_category, p.id as p_id, p.fdc_id as p_fdc_id, p.amount,
-                             p.measure_unit_id, p.portion_description, p.gram_weight, a.id as a_id,
-                             a.fdc_id as a_fdc_id, a.name as a_name, a.value as a_value,
-                             fn.id as fn_id, fn.nutrient_id, fn.amount as fn_amount, nt.id as nt_id,
-                             nt.name as nt_name, nt.unit_name, nt.rank
-                             FROM food_items fi
-                             LEFT JOIN branded_food bf ON fi.id = bf.fdc_id
-                             LEFT JOIN portions p ON fi.id = p.fdc_id
-                             LEFT JOIN food_attributes a ON fi.id = a.fdc_id
-                             LEFT JOIN food_nutrients fn ON fi.id = fn.fdc_id
-                             LEFT JOIN nutrient_types nt ON fn.nutrient_id = nt.id
-                             WHERE fi.name = ?`,
+                              bf.serving_size, bf.serving_size_unit, bf.household_serving_fulltext,
+                              bf.branded_food_category, p.id as p_id, p.fdc_id as p_fdc_id, p.amount,
+                              p.measure_unit_id, p.portion_description, p.gram_weight, a.id as a_id,
+                              a.fdc_id as a_fdc_id, a.name as a_name, a.value as a_value,
+                              fn.id as fn_id, fn.nutrient_id, fn.amount as fn_amount, nt.id as nt_id,
+                              nt.name as nt_name, nt.unit_name, nt.rank
+                              FROM food_items fi
+                              LEFT JOIN branded_food bf ON fi.id = bf.fdc_id
+                              LEFT JOIN portions p ON fi.id = p.fdc_id
+                              LEFT JOIN food_attributes a ON fi.id = a.fdc_id
+                              LEFT JOIN food_nutrients fn ON fi.id = fn.fdc_id
+                              LEFT JOIN nutrient_types nt ON fn.nutrient_id = nt.id
+                              WHERE fi.name = ?`,
                         [b64Name],
                         (_, res) => {
                             if (res.rows.length > 0) {
                                 const row = res.rows.item(0);
-                                // Helper to decode B64 column to string via Tokenizer
                                 const dec = (col: string) => {
                                     if (!col) return '';
                                     return this.tokenizer.decode(Uint8Array.from(Buffer.from(col, 'base64')));
@@ -307,14 +297,12 @@ export class DatabaseService {
                                 const attributes: any[] = [];
                                 let brandedInfo: any = {};
 
-                                // In the loop, we handle the "seen" sets from Dart using JS Sets
                                 const seenN = new Set();
                                 const seenP = new Set();
                                 const seenA = new Set();
 
                                 for (let i = 0; i < res.rows.length; i++) {
                                     const r = res.rows.item(i);
-                                    // Branded Info (Only once)
                                     if (Object.keys(brandedInfo).length === 0 && r.brand_name) {
                                         brandedInfo = {
                                             brand_name: dec(r.brand_name),
@@ -326,7 +314,6 @@ export class DatabaseService {
                                         };
                                     }
 
-                                    // Nutrients
                                     if (r.fn_id && !seenN.has(r.fn_id)) {
                                         nutrients.push({
                                             name: dec(r.nt_name),
@@ -337,7 +324,6 @@ export class DatabaseService {
                                         seenN.add(r.fn_id);
                                     }
 
-                                    // Portions
                                     if (r.p_id && !seenP.has(r.p_id)) {
                                         portions.push({
                                             fdc_id: r.p_fdc_id,
@@ -348,7 +334,6 @@ export class DatabaseService {
                                         seenP.add(r.p_id);
                                     }
 
-                                    // Attributes
                                     if (r.a_id && !seenA.has(r.a_id)) {
                                         attributes.push({
                                             name: dec(r.a_name),
@@ -380,10 +365,6 @@ export class DatabaseService {
     }
 }
 
-// =============================================================
-// 4. RECIPE DATABASE (Singleton)
-// =============================================================
-
 class RecipeDatabase {
     private static instance: RecipeDatabase;
     private db: SQLite.SQLiteDatabase | null = null;
@@ -397,7 +378,6 @@ class RecipeDatabase {
 
     async getDatabase() {
         if (this.db) return this.db;
-        // Ensure recipes.db is in DocDir...
         this.db = await SQLite.openDatabase({ name: 'recipes.db', location: 'default' });
         return this.db;
     }
@@ -406,7 +386,7 @@ class RecipeDatabase {
         const db = await this.getDatabase();
         const recipes: Recipe[] = [];
         const whereClause = searchQuery ? 'name LIKE ?' : '';
-        const args: any[] = searchQuery ? [`%${searchQuery.trim()}%`] : []; // Fixed line here
+        const args: any[] = searchQuery ? [`%${searchQuery.trim()}%`] : [];
 
         try {
             await new Promise<void>((resolve, reject) => {
@@ -455,8 +435,6 @@ export async function copyJsonAssetIfNotExists(source: string, destination: stri
     }
   }
 }
-
-
 
 export const dbService = new DatabaseService();
 export const recipeDb = RecipeDatabase.getInstance();

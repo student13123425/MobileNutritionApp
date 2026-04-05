@@ -1,7 +1,6 @@
 import { FoodLogEntry, PlannedMeal } from "../../CommunScripts/objects";
 import { NutritionalGoals } from "./goals_model";
 
-// Interface for validation result
 export interface ValidationResult {
   isMet: boolean;
   consumedCalories: number;
@@ -15,12 +14,6 @@ export interface ValidationResult {
 }
 
 export class GoalValidator {
-  /**
-   * Checks daily nutritional goals based on logged food entries
-   * @param goals Target nutritional goals
-   * @param logs List of food log entries
-   * @returns Validation result with consumed and remaining values
-   */
   static checkDailyGoals(
     goals: NutritionalGoals,
     logs: FoodLogEntry[]
@@ -55,12 +48,6 @@ export class GoalValidator {
     };
   }
 
-  /**
-   * Checks daily nutritional goals based on planned meals
-   * @param goals Target nutritional goals
-   * @param meals List of planned meals
-   * @returns Validation result with consumed and remaining values
-   */
   static checkDailyGoalsWithPlan(
     goals: NutritionalGoals,
     meals: PlannedMeal[]
@@ -95,41 +82,24 @@ export class GoalValidator {
     };
   }
 
-  /**
-   * Gets progress percentage (0-100) of current vs target
-   * @param current Current value
-   * @param target Target value
-   * @returns Percentage (0-100)
-   */
   static getProgressPercentage(current: number, target: number): number {
     if (target === 0) return 100;
     const percentage = (current / target) * 100;
     return percentage > 100 ? 100 : percentage < 0 ? 0 : percentage;
   }
 
-  /**
-   * Gets color based on progress (green → orange → red)
-   * @param current Current value
-   * @param target Target value
-   * @returns CSS color string
-   */
   static getProgressColor(current: number, target: number): string {
-    if (target === 0) return '#4CAF50'; // Green
+    if (target === 0) return '#4CAF50';
 
     const percentage = current / target;
 
-    if (percentage >= 1.0) return '#4CAF50'; // Green
-    if (percentage >= 0.75) return '#8BC34A'; // Light Green
-    if (percentage >= 0.5) return '#FFC107'; // Orange
-    if (percentage >= 0.25) return '#FF5722'; // Dark Orange
-    return '#F44336'; // Red
+    if (percentage >= 1.0) return '#4CAF50';
+    if (percentage >= 0.75) return '#8BC34A';
+    if (percentage >= 0.5) return '#FFC107';
+    if (percentage >= 0.25) return '#FF5722';
+    return '#F44336';
   }
 
-  /**
-   * Calculates total macros from a list of FoodLogEntry
-   * @param entries List of food log entries
-   * @returns Object with total calories, protein, carbs, fat
-   */
   private static _calculateTotals(entries: FoodLogEntry[]): {
     calories?: number;
     protein?: number;
@@ -159,11 +129,6 @@ export class GoalValidator {
     };
   }
 
-  /**
-   * Calculates total macros from a list of PlannedMeal
-   * @param meals List of planned meals
-   * @returns Object with total calories, protein, carbs, fat
-   */
   private static _calculatePlanTotals(meals: PlannedMeal[]): {
     calories?: number;
     protein?: number;
@@ -207,12 +172,6 @@ export class GoalValidator {
     };
   }
 
-  /**
-   * Safely extract number from any value (string, number, null, etc.)
-   * @param obj Object to extract from
-   * @param key Key to look for
-   * @returns Parsed number or 0
-   */
   private static _safeGetNumber(obj: Record<string, any>, key: string): number {
     const value = obj[key];
     if (value == null) return 0;

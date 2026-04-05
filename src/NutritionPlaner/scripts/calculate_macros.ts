@@ -1,6 +1,5 @@
 import { FoodLogEntry, PlannedMeal } from "../../CommunScripts/objects";
 
-// Utility to safely extract number from a value (string, number, null, etc.)
 function _getDouble(data: Record<string, any>, key: string): number {
   const value = data[key];
   if (value === null || value === undefined) return 0.0;
@@ -16,11 +15,6 @@ function _getDouble(data: Record<string, any>, key: string): number {
 }
 
 export class MacroCalculator {
-  /**
-   * Calculates total macros from a list of FoodLogEntry
-   * @param logs List of food log entries
-   * @returns Object with totals for calories, protein, carbs, fat, sugar, sodium, fiber
-   */
   static calculateTotals(logs: FoodLogEntry[]): Record<string, number> {
     let calories = 0;
     let protein = 0;
@@ -55,11 +49,6 @@ export class MacroCalculator {
     };
   }
 
-  /**
-   * Calculates total macros from a list of PlannedMeal
-   * @param meals List of planned meals
-   * @returns Object with totals for calories, protein, carbs, fat
-   */
   static calculatePlanTotals(meals: PlannedMeal[]): Record<string, number> {
     let calories = 0;
     let protein = 0;
@@ -90,12 +79,6 @@ export class MacroCalculator {
     };
   }
 
-  /**
-   * Generates a daily summary object for logging or UI display
-   * @param logs List of food log entries
-   * @param date Date of the summary
-   * @returns Summary object with date and total macros
-   */
   static getDailySummary(logs: FoodLogEntry[], date: Date): Record<string, any> {
     const totals = this.calculateTotals(logs);
 

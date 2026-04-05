@@ -12,7 +12,7 @@ export const CalendarDay = ({ day, isToday = false, onTap }: CalendarDayProps) =
     <TouchableOpacity
       style={[styles.container, isToday && styles.todayContainer]}
       onPress={onTap}
-      activeOpacity={0.7} // Optional: adds a visual press effect
+      activeOpacity={0.7}
     >
       <Text
         style={[
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 2, // For Android shadow support
+    elevation: 2,
   },
   todayContainer: {
     backgroundColor: '#2E7D32',
@@ -54,4 +54,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CalendarDay; // Optional: if you want to export as default too
+export default CalendarDay;

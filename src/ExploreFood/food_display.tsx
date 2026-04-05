@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,29 +9,21 @@ import {
   Dimensions,
 } from 'react-native';
 
-// import { FoodItem } from '../CommunScripts/objects'; // Ensure this path exists or adjust accordingly
-
-// Mocking external dependencies for compilation safety. 
-// In your actual project, ensure these imports match your file structure.
 import NutritionLoader from '../CommunComponents/LoadingComponent';
 
-// --- MOCKS FOR UNDEFINED DEPENDENCIES (Remove if they exist in your project) ---
 class GroqService {
-  async getGroqApiKey() { return 'mock_key'; } // Replace with actual logic
-  async validateApiKey(key: string) { return true; } // Replace with actual validation
+  async getGroqApiKey() { return 'mock_key'; }
+  async validateApiKey(key: string) { return true; }
   async generateDescription(foodName: string) { 
     return `AI generated description for ${foodName}. This is a sample text to demonstrate the UI layout.`; 
   }
 }
 
-// Define MapEntry class if not imported from elsewhere
 class MapEntry<K, V> {
   constructor(public key: K, public value: V) {}
 }
 
-// Mock function to simulate fetching food data
 async function getFoodItemByName(name: string): Promise<any | null> {
-  // Simulate a delay or error for testing
   if (name === 'NotFound') return null;
   return {
     name,
@@ -50,8 +42,6 @@ async function getFoodItemByName(name: string): Promise<any | null> {
     ]
   };
 }
-
-// --- END OF MOCKS ---
 
 const { width } = Dimensions.get('window');
 
@@ -80,7 +70,6 @@ export const FoodDetailScreen = ({ foodName }: FoodDetailScreenProps) => {
   const [showPortions, setShowPortions] = useState(true);
   const [showBrandedInfo, setShowBrandedInfo] = useState(true);
 
-  // Fetch food data on mount
   useEffect(() => {
     loadFoodData();
   }, []);
@@ -116,7 +105,6 @@ export const FoodDetailScreen = ({ foodName }: FoodDetailScreenProps) => {
         return;
       }
 
-      // Note: In real implementation, validate logic might differ
       const isValid = await groqService.validateApiKey(apiKey);
       if (!isValid) {
         setIsKeyError(true);
@@ -137,7 +125,6 @@ export const FoodDetailScreen = ({ foodName }: FoodDetailScreenProps) => {
     if (isGeneratingDescription) {
       return (
         <View style={styles.section}>
-          {/* Assuming NutritionLoader accepts text and themeColor */}
           <NutritionLoader text="Generating AI Description..." themeColor="#2E7D32" />
         </View>
       );
@@ -236,10 +223,9 @@ export const FoodDetailScreen = ({ foodName }: FoodDetailScreenProps) => {
     trailing?: React.ReactNode;
   }) => (
     <View style={styles.section}>
-      {/* FIX: Wrapped in TouchableOpacity to support onPress */}
       <TouchableOpacity 
         style={[styles.sectionHeader, { backgroundColor }]}
-        activeOpacity={0.7} // Adds a visual feedback effect on press
+        activeOpacity={0.7}
         onPress={onToggle} 
       >
         <View style={styles.sectionTitleContainer}>
@@ -264,7 +250,6 @@ export const FoodDetailScreen = ({ foodName }: FoodDetailScreenProps) => {
       let value = item.toString();
 
       if (item && typeof item === 'object') {
-        // Handle object with name/value properties
         if ('name' in item && item.name) {
           label = String(item.name);
           if ('value' in item && item.value !== null && String(item.value).trim() !== '') {
@@ -298,7 +283,6 @@ export const FoodDetailScreen = ({ foodName }: FoodDetailScreenProps) => {
       parsedItems.push({ label, value });
     }
 
-    // Merge serving_size and serving_size_unit
     const sizeIndex = parsedItems.findIndex((e) => e.label === 'serving_size');
     const unitIndex = parsedItems.findIndex((e) => e.label === 'serving_size_unit');
     if (sizeIndex !== -1 && unitIndex !== -1) {
@@ -400,7 +384,7 @@ export const FoodDetailScreen = ({ foodName }: FoodDetailScreenProps) => {
         {renderConditionalSection({
           title: 'Branded Info',
           isExpanded: showBrandedInfo,
-          items: Object.entries(foodItem.brandedInfo), // Note: entries might need mapping if structure differs
+          items: Object.entries(foodItem.brandedInfo),
           onToggle: () => setShowBrandedInfo(!showBrandedInfo),
         })}
       </ScrollView>
@@ -431,7 +415,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
     marginTop: 8,
-    alignSelf: 'flex-start', // Added for better alignment if needed
+    alignSelf: 'flex-start',
   },
   categoryText: {
     color: '#FFFFFF',
@@ -463,7 +447,7 @@ const styles = StyleSheet.create({
   expandIcon: {
     fontSize: 18,
     color: '#FFFFFF',
-    marginLeft: 12, // Added spacing for icon
+    marginLeft: 12,
   },
   errorContainer: {
     flexDirection: 'row',
@@ -476,7 +460,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginRight: 12,
   },
-  // FIXED: Added missing style property below
   errorIconText: {
     fontSize: 20,
     lineHeight: 24,
@@ -504,7 +487,7 @@ const styles = StyleSheet.create({
   descriptionText: {
     fontSize: 16,
     color: '#000000',
-    lineHeight: 24, // Better readability than 1.6 usually requires explicit height or lineHeight calculation
+    lineHeight: 24,
   },
   ingredientSection: {
     marginBottom: 16,
@@ -527,7 +510,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
-    paddingHorizontal: 16, // Added padding to align labels/values inside section
+    paddingHorizontal: 16,
   },
   label: {
     fontSize: 18,
@@ -562,7 +545,7 @@ const styles = StyleSheet.create({
   refreshText: {
     fontSize: 20,
     color: '#FFFFFF',
-    padding: 8, // Added some padding for touch target
+    padding: 8,
   },
 });
 

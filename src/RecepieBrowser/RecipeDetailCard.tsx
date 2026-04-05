@@ -12,8 +12,6 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
   const [showIngredients, setShowIngredients] = useState(true);
   const [showNutrition, setShowNutrition] = useState(true);
 
-  // --- PARSING LOGIC (Converted from Dart) ---
-
   const cleanString = (str: string) => {
     if (str.startsWith("'") && str.endsWith("'")) {
       return str.substring(1, str.length - 1);
@@ -39,14 +37,12 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
         <Text style={styles.minutesText}>Minutes: {recipe.minutes ?? 0}</Text>
       </View>
 
-      {/* Tag List */}
       <View style={styles.tagWrap}>
         {cleanedTags.map((tag, i) => (
           <View key={i} style={styles.tagChip}><Text style={styles.tagText}>{tag}</Text></View>
         ))}
       </View>
 
-      {/* 1. Description */}
       {recipe.description && (
         <ExpandableCard 
           title="Description" 
@@ -57,7 +53,6 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
         </ExpandableCard>
       )}
 
-      {/* 2. Nutrition Section */}
       {nutritionData.length > 0 && (
         <ExpandableCard 
           title="Nutrition Facts" 
@@ -73,7 +68,6 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
         </ExpandableCard>
       )}
 
-      {/* 3. Preparation Steps */}
       {parsedSteps.length > 0 && (
         <ExpandableCard 
           title="Preparation Steps" 
@@ -88,7 +82,6 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
         </ExpandableCard>
       )}
 
-      {/* 4. Ingredients */}
       {cleanedIngredients.length > 0 && (
         <ExpandableCard 
           title="Ingredients" 
@@ -105,8 +98,6 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
     </ScrollView>
   );
 };
-
-// --- HELPERS ---
 
 function parseNutrition(raw: any) {
   if (!raw) return [];
@@ -126,9 +117,7 @@ function parseNutrition(raw: any) {
     return [{ label: 'Nutrition', value: raw.toString() }];
   }
   return [];
-  }
-
-// --- SUB-COMPONENTS ---
+}
 
 const ExpandableCard = ({ title, children, isExpanded, onToggle }: any) => (
   <View style={styles.card}>

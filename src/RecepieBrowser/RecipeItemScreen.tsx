@@ -10,7 +10,6 @@ interface Props {
 export const RecipeItemScreen: React.FC<Props> = ({ recipe }) => {
   return (
     <View style={styles.container}>
-      {/* Header/AppBar Simulation */}
       <View style={styles.appBar}>
         <View style={styles.headerContent}>
           <Text style={styles.title}>{recipe.name}</Text>
@@ -30,8 +29,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   appBar: {
-    backgroundColor: '#2e7d32', // green.shade700
-    paddingTop: Platform.OS === 'ios' ? 50 : 24, // Adjust for iOS status bar
+    backgroundColor: '#2e7d32',
+    paddingTop: Platform.OS === 'ios' ? 50 : 24,
     paddingBottom: 15,
     paddingHorizontal: 20,
     elevation: 4,
@@ -43,7 +42,7 @@ const styles = StyleSheet.create({
   title: {
     color: 'white',
     fontSize: 20,
-    fontWeight: 'bold' as const, // Explicitly typed for TypeScript
+    fontWeight: 'bold' as const,
   },
   safeArea: {
     flex: 1,
