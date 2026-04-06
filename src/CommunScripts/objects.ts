@@ -4,6 +4,26 @@ export enum ScheduleType {
   DAILY = 'DAILY'
 }
 
+export const AppColorsLight = {
+  primaryGreen: '#2E7D32',
+  lightGreen: '#81C784',
+  white: '#FFFFFF',
+  opacityWhite70: 'rgba(255, 255, 255, 0.7)',
+  backgroundWhite: '#FFF',
+  backgroundLightGray: '#F0F0F0',
+} as const;
+
+export const AppColorsDark = {
+  primaryGreen: '#66BB6A',
+  lightGreen: '#A5D6A7',
+  white: '#FFFFFF',
+  opacityWhite70: 'rgba(255, 255, 255, 0.7)',
+  backgroundWhite: '#1A1A1A',
+  backgroundLightGray: '#2D2D2D',
+} as const;
+
+export type AppColorKey = keyof typeof AppColorsLight;
+
 export enum MealType {
   breakfast = 'breakfast',
   lunch = 'lunch',

@@ -10,8 +10,41 @@ import {
 } from 'react-native';
 import { Recipe } from '../CommunScripts/objects';
 import { dbService, recipeDb } from '../CommunScripts/database';
+import { AppColorsLight, AppColorsDark } from '../style/colors';
 
-export const RecipesScreen: React.FC = () => {
+type RecipesScreenProps = {
+  lightColors?: typeof AppColorsLight;
+  darkColors?: typeof AppColorsDark;
+};
+
+const getActiveColors = (lightColors?: any, darkColors?: any) => {
+  return lightColors || darkColors || AppColorsLight;
+};
+
+const layoutStyles = StyleSheet.create({
+  container: { flex: 1 },
+  searchContainer: { padding: 15, paddingTop: 50 },
+  searchBarWrapper: { flexDirection: 'row', borderRadius: 8, alignItems: 'center', paddingHorizontal: 10 },
+  searchInput: { flex: 1, height: 45 },
+  content: { flex: 1, padding: 16 },
+  card: { 
+    padding: 15, 
+    borderRadius: 8, 
+    marginBottom: 16, 
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  cardTitle: { fontSize: 16, fontWeight: 'bold' },
+  cardSubtitle: { marginTop: 4 },
+  resultsHeader: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  errorText: { fontSize: 18, textAlign: 'center', marginTop: 20 },
+});
+
+export const RecipesScreen: React.FC<RecipesScreenProps> = ({ lightColors, darkColors }) => {
+  const activeColors = getActiveColors(lightColors, darkColors);
+  
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -49,26 +82,23 @@ export const RecipesScreen: React.FC = () => {
     }, 300);
   };
 
-  const noop = () => {};
-
   const renderRecipeItem = ({ item }: { item: Recipe }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => noop()}
-    >
-      <Text style={styles.cardTitle}>{item.name}</Text>
-      <Text style={styles.cardSubtitle}>Minutes: {item.minutes}</Text>
+    <TouchableOpacity style={layoutStyles.card}>
+      <Text style={[layoutStyles.cardTitle, { color: activeColors.primaryGreen }]}>{item.name}</Text>
+      <Text style={{ ...layoutStyles.cardSubtitle, color: '#666' }}>Minutes: {item.minutes}</Text>
     </TouchableOpacity>
   );
 
+  const noop = () => {};
+
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBarWrapper}>
+    <View style={layoutStyles.container}>
+      <View style={[layoutStyles.searchContainer, { backgroundColor: activeColors.primaryGreen }]}>
+        <View style={layoutStyles.searchBarWrapper}>
           <TextInput
-            style={styles.searchInput}
+            style={[layoutStyles.searchInput, { color: activeColors.primaryGreen }]}
             placeholder="Search recipes by name..."
-            placeholderTextColor="#81c784"
+            placeholderTextColor={activeColors.lightGreen}
             value={searchText}
             onChangeText={_onSearchTextChanged}
           />
@@ -77,24 +107,24 @@ export const RecipesScreen: React.FC = () => {
               setSearchText('');
               _loadRecipes('');
             }}>
-              <Text style={{ color: '#2e7d32' }}>✕</Text>
+              <Text style={{ color: activeColors.primaryGreen, fontWeight: 'bold' }}>✕</Text>
             </TouchableOpacity>
           )}
         </View>
       </View>
 
-      <View style={styles.content}>
+      <View style={layoutStyles.content}>
         {isLoading ? (
-          <ActivityIndicator size="large" color="#2e7d32" />
+          <ActivityIndicator size="large" color={activeColors.primaryGreen} />
         ) : errorMessage ? (
-          <Text style={styles.errorText}>{errorMessage}</Text>
+          <Text style={{ ...layoutStyles.errorText, color: '#f44336' }}>{errorMessage}</Text>
         ) : (
           <FlatList
             data={recipes}
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderRecipeItem}
             ListHeaderComponent={() => (
-              <Text style={styles.resultsHeader}>Search Results</Text>
+              <Text style={{ ...layoutStyles.resultsHeader, color: activeColors.primaryGreen }}>{activeColors.backgroundWhite === '#fff' ? 'Search Results' : 'Rezultate căutare'}</Text>
             )}
           />
         )}
@@ -103,38 +133,4 @@ export const RecipesScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  searchContainer: {
-    backgroundColor: '#2e7d32',
-    padding: 15,
-    paddingTop: 50,
-  },
-  searchBarWrapper: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    alignItems: 'center',
-    paddingHorizontal: 10,
-  },
-  searchInput: {
-    flex: 1,
-    height: 45,
-    color: '#1b5e20',
-  },
-  content: { flex: 1, padding: 16 },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  cardTitle: { fontSize: 16, fontWeight: 'bold' },
-  cardSubtitle: { color: '#666', marginTop: 4 },
-  resultsHeader: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  errorText: { color: 'red', fontSize: 18, textAlign: 'center', marginTop: 20 },
-});
+export default RecipesScreen;

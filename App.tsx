@@ -12,8 +12,12 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { checkStartedFlag } from './src/CommunScripts/config';
+import { AppColorsLight, AppColorsDark, getLightColors, getDarkColors } from './src/style/colors';
+import { checkStartedFlag, isDarkModeEnabled, setDarkMode } from './src/CommunScripts/config';
 import HomeScreen from './src/Homescreen';
+import SettingsScreen from './src/SettingsScreen';
+import RecipesScreen from './src/RecepieBrowser/RecipesScreen';
+import RecipeItemScreen from './src/RecepieBrowser/RecipeItemScreen';
 
 type FeatureCardProps = {
   icon: string;
@@ -94,8 +98,6 @@ const HomePage = () => {
   );
 };
 
-
-
 const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
   return (
     <View style={styles.featureCard}>
@@ -111,13 +113,22 @@ const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
 let navigationRef: React.RefObject<any> | null = null;
 
 const App = () => {
+  type LightColorPalette = typeof AppColorsLight;
+  type DarkColorPalette = typeof AppColorsDark;
+  
   const [started, setStarted] = useState(false);
+  const [lightModeColors, setLightModeColors] = useState<LightColorPalette>(AppColorsLight);
+  const [darkModeColors, setDarkModeColors] = useState<DarkColorPalette>(AppColorsDark);
 
   useEffect(() => {
     const loadApp = async () => {
       try {
         const isStarted = await checkStartedFlag();
         setStarted(isStarted);
+        
+        // Initialize color palettes on app load
+        setLightModeColors(AppColorsLight);
+        setDarkModeColors(AppColorsDark);
       } catch (e) {
         console.error('App init error:', e);
       }
@@ -126,20 +137,31 @@ const App = () => {
     loadApp();
   }, []);
 
+  // Export colors for use in other components
+  const lightColors = lightModeColors;
+  const darkColors = darkModeColors;
+
   return (
     <NavigationContainer
       ref={navigationRef}
     >
       <Stack.Navigator id="app" initialRouteName={started ? 'HomeScreen' : 'Introduction'}>
-        <Stack.Screen
-          name="Introduction"
-          component={HomePage}
+      <Stack.Screen
+          name="HomeScreen"
+          component={(props: any) => <HomeScreen lightColors={lightColors} darkColors={darkColors} {...(props as any)} />}
           options={{ headerShown: false }}
         />
+          <Stack.Screen
+          name="ExploreFood"
+          component={RecipesScreen}
+          options={{ title: 'Browse', headerShown: true }}
+        />
         <Stack.Screen
-          name="HomeScreen"
-          component={HomeScreen}
-          options={{ headerShown: false }}
+          name="RecipeItem"
+          component={(props: any) => (
+            <RecipeItemScreen recipe={(props as any).route.params.recipe} lightColors={lightColors} darkColors={darkColors} />
+          )}
+          options={{ title: 'Recipe', headerShown: true }}
         />
       </Stack.Navigator>
     </NavigationContainer>

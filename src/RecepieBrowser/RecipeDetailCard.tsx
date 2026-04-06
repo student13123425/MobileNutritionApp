@@ -1,12 +1,71 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Recipe } from '../CommunScripts/objects';
+import { AppColorsLight, AppColorsDark } from '../style/colors';
 
-interface Props {
+type RecipeDetailCardProps = {
   recipe: Recipe;
-}
+  lightColors?: typeof AppColorsLight;
+  darkColors?: typeof AppColorsDark;
+};
 
-export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
+const getActiveColors = (lightColors?: any, darkColors?: any) => {
+  return lightColors || darkColors || AppColorsLight;
+};
+
+const layoutStyles = StyleSheet.create({
+  container: { padding: 16 },
+  recipeName: { fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
+  minutesBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginVertical: 10,
+  },
+  minutesText: { fontWeight: '500' },
+  tagWrap: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 },
+  tagChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginRight: 8, marginBottom: 8 },
+  tagText: { fontSize: 12 },
+  card: { 
+    borderRadius: 8, 
+    marginBottom: 16, 
+    elevation: 2, 
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+  },
+  cardHeader: {
+    padding: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  cardHeaderText: { fontWeight: '600', fontSize: 16 },
+  arrow: {},
+  cardContent: { padding: 15 },
+  bodyText: { fontSize: 18, color: '#333' },
+  stepBox: { 
+    backgroundColor: '#e8f5e9', 
+    padding: 12, 
+    borderRadius: 8, 
+    marginBottom: 8,
+  },
+  stepText: { fontSize: 16, fontWeight: '500' },
+  ingredientRow: { flexDirection: 'row', paddingVertical: 4 },
+  ingredientText: { fontSize: 18, color: '#333' },
+  nutritionRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    paddingVertical: 8, 
+    borderBottomWidth: 0.5, 
+    borderBottomColor: '#eee',
+  },
+  nutritionLabel: { fontSize: 16, fontWeight: '500' },
+  nutritionValue: { fontSize: 16, fontWeight: 'bold' },
+});
+
+export const RecipeDetailCard: React.FC<RecipeDetailCardProps> = ({ recipe, lightColors, darkColors }) => {
+  const activeColors = getActiveColors(lightColors, darkColors);
+  
   const [showDescription, setShowDescription] = useState(true);
   const [showSteps, setShowSteps] = useState(true);
   const [showIngredients, setShowIngredients] = useState(true);
@@ -30,16 +89,16 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
   const nutritionData = parseNutrition(recipe.nutrition);
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.recipeName}>{recipe.name ?? 'Unknown'}</Text>
+    <ScrollView style={layoutStyles.container}>
+      <Text style={[layoutStyles.recipeName, { color: activeColors.primaryGreen }]}>{recipe.name ?? 'Unknown'}</Text>
       
-      <View style={styles.minutesBadge}>
-        <Text style={styles.minutesText}>Minutes: {recipe.minutes ?? 0}</Text>
+      <View style={[layoutStyles.minutesBadge, { backgroundColor: activeColors.primaryGreen }]}>
+        <Text style={[layoutStyles.minutesText, { color: '#FFFFFF' }]}>Minutes: {recipe.minutes ?? 0}</Text>
       </View>
 
-      <View style={styles.tagWrap}>
+      <View style={layoutStyles.tagWrap}>
         {cleanedTags.map((tag, i) => (
-          <View key={i} style={styles.tagChip}><Text style={styles.tagText}>{tag}</Text></View>
+          <View key={i} style={[layoutStyles.tagChip, { backgroundColor: activeColors.primaryGreen }]}><Text style={[layoutStyles.tagText, { color: '#FFFFFF' }]}>{tag}</Text></View>
         ))}
       </View>
 
@@ -48,8 +107,9 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
           title="Description" 
           isExpanded={showDescription} 
           onToggle={() => setShowDescription(!showDescription)}
+          activeColors={activeColors}
         >
-          <Text style={styles.bodyText}>{recipe.description}</Text>
+          <Text style={[layoutStyles.bodyText, { color: '#333' }]}>{recipe.description}</Text>
         </ExpandableCard>
       )}
 
@@ -58,11 +118,12 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
           title="Nutrition Facts" 
           isExpanded={showNutrition} 
           onToggle={() => setShowNutrition(!showNutrition)}
+          activeColors={activeColors}
         >
           {nutritionData.map((item, i) => (
-            <View key={i} style={styles.nutritionRow}>
-              <Text style={styles.nutritionLabel}>{item.label}</Text>
-              <Text style={styles.nutritionValue}>{item.value}</Text>
+            <View key={i} style={layoutStyles.nutritionRow}>
+              <Text style={[layoutStyles.nutritionLabel, { color: activeColors.primaryGreen }]}>{item.label}</Text>
+              <Text style={layoutStyles.nutritionValue}>{item.value}</Text>
             </View>
           ))}
         </ExpandableCard>
@@ -73,10 +134,11 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
           title="Preparation Steps" 
           isExpanded={showSteps} 
           onToggle={() => setShowSteps(!showSteps)}
+          activeColors={activeColors}
         >
           {parsedSteps.map((step, i) => (
-            <View key={i} style={styles.stepBox}>
-              <Text style={styles.stepText}>{i + 1}. {step}</Text>
+            <View key={i} style={[layoutStyles.stepBox, { backgroundColor: activeColors.lightGreen }]}>
+              <Text style={[layoutStyles.stepText, { color: activeColors.primaryGreen }]}>{i + 1}. {step}</Text>
             </View>
           ))}
         </ExpandableCard>
@@ -87,10 +149,11 @@ export const RecipeDetailCard: React.FC<Props> = ({ recipe }) => {
           title="Ingredients" 
           isExpanded={showIngredients} 
           onToggle={() => setShowIngredients(!showIngredients)}
+          activeColors={activeColors}
         >
           {cleanedIngredients.map((ing, i) => (
-            <View key={i} style={styles.ingredientRow}>
-              <Text style={styles.ingredientText}>• {ing}</Text>
+            <View key={i} style={layoutStyles.ingredientRow}>
+              <Text style={[layoutStyles.ingredientText, { color: '#333' }]}>{'• '}{ing}</Text>
             </View>
           ))}
         </ExpandableCard>
@@ -119,54 +182,29 @@ function parseNutrition(raw: any) {
   return [];
 }
 
-const ExpandableCard = ({ title, children, isExpanded, onToggle }: any) => (
-  <View style={styles.card}>
-    <TouchableOpacity style={styles.cardHeader} onPress={onToggle}>
-      <Text style={styles.cardHeaderText}>{title}</Text>
-      <Text style={styles.arrow}>{isExpanded ? '▴' : '▾'}</Text>
-    </TouchableOpacity>
-    {isExpanded && <View style={styles.cardContent}>{children}</View>}
-  </View>
-);
+type ExpandableCardProps = {
+  title: string;
+  children: React.ReactNode;
+  isExpanded: boolean;
+  onToggle: () => void;
+  activeColors?: typeof AppColorsLight | typeof AppColorsDark;
+};
 
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  recipeName: { fontSize: 24, fontWeight: 'bold', color: '#1b5e20' },
-  minutesBadge: {
-    backgroundColor: '#2e7d32',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    marginVertical: 10,
-  },
-  minutesText: { color: 'white', fontWeight: '500' },
-  tagWrap: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 },
-  tagChip: {
-    backgroundColor: '#2e7d32',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  tagText: { color: 'white', fontSize: 12 },
-  card: { backgroundColor: '#fff', borderRadius: 8, marginBottom: 16, elevation: 2, overflow: 'hidden' },
-  cardHeader: {
-    backgroundColor: '#2e7630',
-    padding: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  cardHeaderText: { color: 'white', fontWeight: '600', fontSize: 16 },
-  arrow: { color: 'white' },
-  cardContent: { padding: 15 },
-  bodyText: { fontSize: 18, color: '#333' },
-  stepBox: { backgroundColor: '#e8f5e9', padding: 12, borderRadius: 8, marginBottom: 8 },
-  stepText: { fontSize: 16, fontWeight: '500', color: '#1b5e20' },
-  ingredientRow: { flexDirection: 'row', paddingVertical: 4 },
-  ingredientText: { fontSize: 18, color: '#333' },
-  nutritionRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
-  nutritionLabel: { fontSize: 16, fontWeight: '500', color: '#2e7d32' },
-  nutritionValue: { fontSize: 16, fontWeight: 'bold' },
-});
+const ExpandableCard = ({ title, children, isExpanded, onToggle, activeColors }: ExpandableCardProps) => {
+  const headerBgColor = activeColors ? (activeColors.backgroundWhite === '#fff' ? '#2e7630' : 'rgba(128,128,128,0.3)') : '#2e7630';
+  
+  return (
+    <View style={[layoutStyles.card, { backgroundColor: activeColors.backgroundWhite }]} key={title.toLowerCase()}>
+      <TouchableOpacity 
+        style={[layoutStyles.cardHeader, { backgroundColor: headerBgColor }]} 
+        onPress={onToggle}
+      >
+        <Text style={[layoutStyles.cardHeaderText, { color: '#FFFFFF' }]}>{title}</Text>
+        <Text style={[layoutStyles.arrow, { color: '#FFFFFF' }]}>{isExpanded ? '▴' : '▾'}</Text>
+      </TouchableOpacity>
+      {isExpanded && <View style={layoutStyles.cardContent}>{children}</View>}
+    </View>
+  );
+};
+
+export default RecipeDetailCard;

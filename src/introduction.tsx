@@ -18,6 +18,8 @@ interface Slide {
 
 interface IntroductionPageProps {
   navigation: any;
+  lightColors?: any;
+  darkColors?: any;
 }
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
